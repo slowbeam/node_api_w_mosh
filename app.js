@@ -1,2 +1,5 @@
+const path = require('path');
 
-console.log(module);
+const pathObj = path.parse(__filename);
+
+console.log(pathObj);
