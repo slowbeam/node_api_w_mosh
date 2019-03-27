@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const Joi = require('joi');
 
+app.use(express.json());
+
 const genres = [
     { id: 1, name: "Horror" },
     { id: 2, name: "Action" },
@@ -15,8 +17,6 @@ function validateGenre(genre) {
 
     return Joi.validate(genre, schema);
 }
-
-app.use(express.json());
 
 app.get('/api/genres', (req, res) => {
     res.send(genres);
