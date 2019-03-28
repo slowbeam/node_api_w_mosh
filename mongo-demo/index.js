@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb+srv://slowbeam:password@vidly-api-i80z8.mongodb.net/test?retryWrites=true', { useNewUrlParser: true })
+const mongoURI = process.env.MONGO_URI;
+
+mongoose.connect( mongoURI, { useNewUrlParser: true })
     .then(() => { console.log('Connected to MongoDB...')})
     .catch(err => console.error('Could not connect to MongoDB', err));
 
