@@ -1,13 +1,10 @@
 const express = require('express');
 const app = express();
-const logger = require('./logger');
+const logger = require('./middleware/logger');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const config = require('config');
-
 const startupDebugger = require('debug')('app:startup');
-const dbDebugger = require('debug')('app:db');
-
 const courses = require('./routes/courses');
 const home = require('./routes/home');
 
