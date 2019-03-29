@@ -41,12 +41,29 @@ async function getCourses() {
     // in 
     // nin (not in)
 
+    // Logical operators
+    // or
+    // and
+
+    const pageNumber = 2;
+    const pageSize = 10;
+
     const courses =  await Course
-        // .find({ author: 'Mosh', isPublished: true })
-        .find({ price: { $gte: 10 } })
+        .find({ author: 'Mosh', isPublished: true })
+
+        // Starts with Mosh
+        // .find({ author: /^Mosh/ })
+
+        // Ends with Hamedani
+        // .find({ author: /Hamedani$/i })
+
+        // Contains the word Mosh
+        // .find({ author: /.*Mosh.*/i })
+
+        .skip()
         .limit(10)
         .sort({ name: 1 })
-        .select({ name: 1, tags: 1 })
+        .count()
     console.log(courses);
 }
 
