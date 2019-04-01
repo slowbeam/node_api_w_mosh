@@ -47,15 +47,22 @@ async function getCourses() {
     const pageNumber = 2;
     const pageSize = 10;
 
+    async function getCourses() {
+        return await Course
+        .find({ isPublished: true})
+        .or( { price: { $gte: 15} },
+             { name: /.*by.*/i }
+        )
+        
 
-    const courses =  await Course
-        .find({ isPublished: true }, {name: 1, author: 1, _id: 0})
-        .sort({ name: -1 })
         // Starts with Mosh
         // .find({ author: /^Mosh/ })
 
         // Ends with Hamedani
         // .find({ author: /Hamedani$/i })
+
+        // Filter the search to only display certain attributes
+        // .select({ name: 1, author: 1, _id: 0})
 
         // Contains the word Mosh
         // .find({ author: /.*Mosh.*/i })
@@ -64,7 +71,59 @@ async function getCourses() {
         // .limit(pageSize)
         
         // .count()
-    console.log(courses);
+      
+    }
+
+    // async function run() {
+    //     const courses = await getCourses();
+    //     console.log(courses);
+    // }
+
+    // run();
+
+    async function updateCourse(id) {
+        // Approach 1: query first
+        // findById()
+        // Modify its properties
+        // save
+
+        // const course = await Course.findById(id);
+        // if (!course) return;
+
+        // course.isPublished = true;
+        // course.author = 'Another Author';
+        
+        // const result = await course.save();
+        // console.log(result);
+
+        // Approach 2: update first
+        // findById()
+        // Modify its properties
+        // save() 
+
+        const result = await Course.findByIdAndUpdate( id, {
+            $set: {
+                author: 'BABA',
+                isPublished: false
+            }
+        }, {new: true} );
+
+        console.log(result);
+
+        
+    }
+    
+
+    async function removeCourse(id) {
+        // const result = await Course.deleteOne({ _id: id });
+        const result = await Course.findByIdAndRemove( id );
+        console.log(result);
+        
+    }
+
+    removeCourse('5ca26d6e1c9d4400004b912a');
+    
+   
 }
 
 getCourses();
