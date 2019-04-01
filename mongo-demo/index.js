@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const mongoURI = process.env.MONGO_URI;
 
 mongoose.connect( mongoURI, { useNewUrlParser: true })
@@ -48,9 +47,10 @@ async function getCourses() {
     const pageNumber = 2;
     const pageSize = 10;
 
-    const courses =  await Course
-        .find({ author: 'Mosh', isPublished: true })
 
+    const courses =  await Course
+        .find({ isPublished: true }, {name: 1, author: 1, _id: 0})
+        .sort({ name: -1 })
         // Starts with Mosh
         // .find({ author: /^Mosh/ })
 
@@ -60,10 +60,10 @@ async function getCourses() {
         // Contains the word Mosh
         // .find({ author: /.*Mosh.*/i })
 
-        .skip()
-        .limit(10)
-        .sort({ name: 1 })
-        .count()
+        // .skip((pageNumber - 1) * pageSize)
+        // .limit(pageSize)
+        
+        // .count()
     console.log(courses);
 }
 
