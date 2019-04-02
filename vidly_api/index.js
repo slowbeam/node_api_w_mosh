@@ -1,8 +1,9 @@
 const express = require('express');
 const app = express();
+const mongoose = require('mongoose');
 const genres = require('./routes/genres');
 const customers = require('./routes/customers');
-const mongoose = require('mongoose');
+
 
 const mongoURI = process.env.MONGO_URI;
 

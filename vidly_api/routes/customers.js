@@ -1,37 +1,6 @@
 const express = require('express');
-const app = express();
-const mongoose = require('mongoose');
-const Joi = require('joi');
 const router = express.Router();
-
-const customerSchema = new mongoose.Schema({
-    isGold: {
-       type: Boolean,
-       required: true
-    },
-    name: {
-        type: String,
-        required: true,
-        minlength: 5,
-        maxlength: 50
-    },
-    phone: {
-        type: String,
-        required: true
-    }
-});
-
-const Customer = mongoose.model('Customer', customerSchema);
-
-const validateCustomer = (customer) => {
-    const schema = Joi.object().keys({
-        isGold: Joi.boolean().required(),
-        name: Joi.string().min(5).max(50).required(),
-        phone: Joi.string().required()
-    });
-
-    return Joi.validate(customer, schema);
-};
+const {Customer, validate} = require('../models/customer');
 
 router.get("/", async (req, res) => {
     const customers = await Customer.find().sort({ name: 1 });
@@ -39,18 +8,40 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-    const {errors} = validateCustomer(req.body);
+    const {errors} = validate(req.body);
     if (errors) res.status(400).send(errors);
 
-    const customer = new Customer({
-        isGold: req.body.isGold,
+    let customer = new Customer({  
         name: req.body.name,
-        phone: req.body.phone
+        phone: req.body.phone,
+        isGold: req.body.isGold
     });
+
+    customer = await customer.save();
+    res.send(customer);
+});
+
+router.put("/:id", async (req, res) => {
+    const { errors } = validate(req.body);
+    if (errors) return res.status(400).send(errors);
+
+    const customer = await Customer.findById(req.params.id);
+
+    if (!customer) res.status(404).send("The customer with the provided ID was not found.");
+
+    customer.isGold = req.body.isGold || customer.isGold;
+    customer.name = req.body.name || customer.name;
+    customer.phone = req.body.phone || customer.phone;
 
     const result = await customer.save();
     res.send(result);
-})
+});
+
+router.delete("/:id", async (req, res) => {
+    const customer = await Customer.findOneAndDelete({ _id: req.params.id });
+    if (!customer) res.status(404).send("The customer with the provided ID was not found.");
+    res.send(customer);
+});
 
 module.exports = router;
 
