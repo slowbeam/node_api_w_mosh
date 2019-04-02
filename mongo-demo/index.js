@@ -15,22 +15,22 @@ const courseSchema = new mongoose.Schema({
     category: {
         type: String,
         required: true,
-        enum: ['web', 'mobile', 'network']
+        enum: ['web', 'mobile', 'network'],
+        lowercase: true,
+        // uppercase: true,
+        trim: true
     },
     author: String,
     tags: {
         type: Array,
         validate: {
             isAsync: true,
-            validator: function(v, callback) {
-                
+            validator: function(v, callback) {   
                 setTimeout(() => {
                     //Do some async work
                     const result = v && v.length > 0;
                     callback(result);
-                }, 4000);
-                
-               
+                }, 4000);  
             },
             message: "A course should have at least one tag."
         }
@@ -41,7 +41,9 @@ const courseSchema = new mongoose.Schema({
         type: Number,
         required: function() { return this.isPublished },
         min: 10,
-        max: 200
+        max: 200,
+        get: v => Math.round(v),
+        set: v => Math.round(v)
     }
 });
    
@@ -50,12 +52,12 @@ const Course = mongoose.model('Course', courseSchema);
 async function createCourse() {
 
     const course = new Course({
-        category: '-',
+        category: 'Web',
         author: 'Mosh',
-        tags: null,
+        tags: ['frontend'],
         isPublished: true,
         name: 'my course',
-        price: 15
+        price: 15.8
     })
     try {
         const result = await course.save();
@@ -68,8 +70,6 @@ async function createCourse() {
     
 
 }
-
-
 
 // Comparison operators in MongoDB:
 // eq (equal)
@@ -87,13 +87,17 @@ async function createCourse() {
 
 
 async function getCourses() {
-    return await Course
-    .find({ isPublished: true})
-    .or( { price: { $gte: 15} },
-            { name: /.*by.*/i }
-    )
-    
+    const courses = await Course
+    .find({ _id: '5ca26e6e1c9d4400004b912b'})
+    .sort({ name: 1})
+    .select({name: 1, tags: 1, price: 1});
+    console.log(courses[0].price);
 
+
+    // .or( { price: { $gte: 15} },
+    //         { name: /.*by.*/i }
+    // )
+    
     // Starts with Mosh
     // .find({ author: /^Mosh/ })
 
@@ -159,5 +163,5 @@ async function removeCourse(id) {
     
 }
 
-createCourse();
+getCourses();
 
