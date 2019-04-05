@@ -6,8 +6,6 @@ const _ = require('lodash');
 const bcrypt = require('bcrypt');
 const {User} = require('../models/user');
 
-
-
 router.post('/', async (req, res) => {
     const {error} = validate(req.body);
     if (error) res.status(400).send(error);
@@ -18,7 +16,8 @@ router.post('/', async (req, res) => {
     const validPassword = await bcrypt.compare(req.body.password, user.password);
     if (!validPassword) res.status(400).send('Invalid email or password.');
 
-    res.send(true);
+    const token = user.generateAuthToken();
+    res.send(token);
 });
 
 function validate(req) {

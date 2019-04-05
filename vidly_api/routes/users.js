@@ -3,10 +3,10 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const _ = require('lodash');
 const bcrypt = require('bcrypt');
+const auth = require('../middleware/auth');
 const {User, validate} = require('../models/user');
 
-
-
+// Register a new user
 router.post('/', async (req, res) => {
     const {error} = validate(req.body);
     if (error) res.status(400).send(error);
@@ -20,7 +20,14 @@ router.post('/', async (req, res) => {
 
     await user.save();
 
-    res.send(_.pick(user, ['_id', 'name', 'email']));
+    const token = user.generateAuthToken();
+    res.header('x-auth-token', token).send(_.pick(user, ['_id', 'name', 'email']));
+});
+
+// Get the current user
+router.get('/me', auth, async (req, res) => {
+    const user = await User.findById(req.user._id).select('-password');
+    res.send(user);
 });
 
 module.exports = router;

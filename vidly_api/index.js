@@ -3,6 +3,7 @@ const app = express();
 const mongoose = require('mongoose');
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
+const config = require('config');
 const genres = require('./routes/genres');
 const customers = require('./routes/customers');
 const movies = require('./routes/movies');
@@ -12,10 +13,16 @@ const auth = require('./routes/auth');
 
 const mongoURI = process.env.MONGO_URI;
 
+if (!config.get('jwtPrivateKey')) {
+    console.error('FATAL ERROR: jwtPrivateKey is not defined');
+    process.exit(1);
+}
+
 mongoose.connect( mongoURI, {useNewUrlParser: true})
     .then(() => console.log('Connected to MongoDB...'))
     .catch((error) => console.log('Could not connect to MongoDB'));
 
+// Middleware
 app.use(express.json());
 
 // Routes
